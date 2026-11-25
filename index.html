@@ -47,169 +47,68 @@
 
     <script>
         window.onload = function() {
-            if (typeof THREE === 'undefined') {
-                document.getElementById('status').innerHTML = '<strong style="color:red;">❌ Gagal memuat</strong>';
-                return;
-            }
-
+            if (typeof THREE === 'undefined') { return; }
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87CEEB);
             scene.fog = new THREE.Fog(0x87CEEB, 15, 40);
-
             const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
             camera.position.set(0, 8, 12);
             camera.lookAt(0, 2, 0);
-
             const renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             document.body.insertBefore(renderer.domElement, document.body.firstChild);
-
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.maxPolarAngle = Math.PI / 2.1;
-            controls.minDistance = 5;
-            controls.maxDistance = 25;
-
-            // === Pencahayaan ===
             scene.add(new THREE.AmbientLight(0xfff8dc, 0.5));
-            
             const matahari = new THREE.DirectionalLight(0xffffff, 1.0);
             matahari.position.set(12, 20, 8);
             matahari.castShadow = true;
-            matahari.shadow.mapSize.width = 2048;
-            matahari.shadow.mapSize.height = 2048;
-            matahari.shadow.camera.left = -15;
-            matahari.shadow.camera.right = 15;
-            matahari.shadow.camera.top = 15;
-            matahari.shadow.camera.bottom = -15;
             scene.add(matahari);
-
-            const lampuTambahan = new THREE.HemisphereLight(0x87CEEB, 0xdeb887, 0.35);
-            scene.add(lampuTambahan);
-
-            // === Lantai ===
-            const lantaiGeo = new THREE.PlaneGeometry(24, 16);
-            const lantaiMat = new THREE.MeshLambertMaterial({ color: 0xd9b38c });
-            const lantai = new THREE.Mesh(lantaiGeo, lantaiMat);
+            const lantai = new THREE.Mesh(new THREE.PlaneGeometry(24, 16), new THREE.MeshLambertMaterial({ color: 0xd9b38c }));
             lantai.rotation.x = -Math.PI / 2;
             lantai.receiveShadow = true;
             scene.add(lantai);
             scene.add(new THREE.GridHelper(24, 24, 0xb8956c, 0xb8956c));
-
-            // === Dinding Ruangan ===
             const dindingMat = new THREE.MeshLambertMaterial({ color: 0xf5f5f5 });
-            
-            // Dinding Depan
             const dindingDepan = new THREE.Mesh(new THREE.BoxGeometry(24, 4, 0.3), dindingMat);
-            dindingDepan.position.z = -8;
-            dindingDepan.position.y = 2;
-            dindingDepan.receiveShadow = true;
-            dindingDepan.castShadow = true;
+            dindingDepan.position.z = -8; dindingDepan.position.y = 2;
             scene.add(dindingDepan);
-
-            // Dinding Belakang
             const dindingBelakang = new THREE.Mesh(new THREE.BoxGeometry(24, 4, 0.3), dindingMat);
-            dindingBelakang.position.z = 8;
-            dindingBelakang.position.y = 2;
-            dindingBelakang.receiveShadow = true;
-            dindingBelakang.castShadow = true;
+            dindingBelakang.position.z = 8; dindingBelakang.position.y = 2;
             scene.add(dindingBelakang);
-
-            // Dinding Kiri
             const dindingKiri = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 16), dindingMat);
-            dindingKiri.position.x = -12;
-            dindingKiri.position.y = 2;
-            dindingKiri.receiveShadow = true;
-            dindingKiri.castShadow = true;
+            dindingKiri.position.x = -12; dindingKiri.position.y = 2;
             scene.add(dindingKiri);
-
-            // Dinding Kanan
             const dindingKanan = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 16), dindingMat);
-            dindingKanan.position.x = 12;
-            dindingKanan.position.y = 2;
-            dindingKanan.receiveShadow = true;
-            dindingKanan.castShadow = true;
+            dindingKanan.position.x = 12; dindingKanan.position.y = 2;
             scene.add(dindingKanan);
-
-            // Pintu Masuk
-            const pintuMat = new THREE.MeshLambertMaterial({ color: 0x6f4e37 });
-            const pintu = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3, 0.15), pintuMat);
+            const pintu = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3, 0.15), new THREE.MeshLambertMaterial({ color: 0x6f4e37 }));
             pintu.position.set(0, 1.5, -7.8);
             scene.add(pintu);
-
-            // === Fungsi Buat Meja ===
             function buatMeja(x, z) {
                 const meja = new THREE.Group();
-                
-                const atas = new THREE.Mesh(
-                    new THREE.BoxGeometry(1.6, 0.1, 0.8),
-                    new THREE.MeshLambertMaterial({ color: 0x8b5a2b })
-                );
-                atas.position.y = 0.75;
-                atas.castShadow = true;
-                atas.receiveShadow = true;
-                meja.add(atas);
-
-                const kakiGeo = new THREE.BoxGeometry(0.08, 0.75, 0.08);
-                const kakiMat = new THREE.MeshLambertMaterial({ color: 0x5c3a1d });
+                const atas = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.1, 0.8), new THREE.MeshLambertMaterial({ color: 0x8b5a2b }));
+                atas.position.y = 0.75; atas.castShadow = true; meja.add(atas);
                 [[-0.7, -0.35], [0.7, -0.35], [-0.7, 0.35], [0.7, 0.35]].forEach(([dx, dz]) => {
-                    const kaki = new THREE.Mesh(kakiGeo, kakiMat);
-                    kaki.position.set(dx, 0.375, dz);
-                    kaki.castShadow = true;
-                    meja.add(kaki);
+                    const kaki = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.75, 0.08), new THREE.MeshLambertMaterial({ color: 0x5c3a1d }));
+                    kaki.position.set(dx, 0.375, dz); kaki.castShadow = true; meja.add(kaki);
                 });
-
-                const kursi = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.4, 0.55, 0.4),
-                    new THREE.MeshLambertMaterial({ color: 0x444444 })
-                );
-                kursi.position.set(0, 0.275, 0.6);
-                kursi.castShadow = true;
-                meja.add(kursi);
-
-                meja.position.set(x, 0, z);
-                scene.add(meja);
-                return meja;
+                const kursi = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.55, 0.4), new THREE.MeshLambertMaterial({ color: 0x444444 }));
+                kursi.position.set(0, 0.275, 0.6); kursi.castShadow = true; meja.add(kursi);
+                meja.position.set(x, 0, z); scene.add(meja);
             }
-
-            // === Fungsi Buat Karakter ===
             function buatOrang(nama, x, z, warna) {
                 const grup = new THREE.Group();
-                
-                const badan = new THREE.Mesh(
-                    new THREE.CapsuleGeometry(0.2, 0.4, 4, 8),
-                    new THREE.MeshLambertMaterial({ color: warna })
-                );
-                badan.position.y = 0.6;
-                badan.castShadow = true;
-                grup.add(badan);
-                
-                const kepala = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.16),
-                    new THREE.MeshLambertMaterial({ color: 0xffdbac })
-                );
-                kepala.position.y = 1.15;
-                kepala.castShadow = true;
-                grup.add(kepala);
-                
-                grup.position.set(x, 0, z);
-                scene.add(grup);
-                return grup;
+                const badan = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.4, 4, 8), new THREE.MeshLambertMaterial({ color: warna }));
+                badan.position.y = 0.6; badan.castShadow = true; grup.add(badan);
+                const kepala = new THREE.Mesh(new THREE.SphereGeometry(0.16), new THREE.MeshLambertMaterial({ color: 0xffdbac }));
+                kepala.position.y = 1.15; grup.add(kepala);
+                grup.position.set(x, 0, z); scene.add(grup);
             }
-
-            // === Ruang Rapat ===
-            const mejaRapat = new THREE.Mesh(
-                new THREE.BoxGeometry(4, 0.15, 1.8),
-                new THREE.MeshLambertMaterial({ color: 0x5d3a1a })
-            );
-            mejaRapat.position.set(0, 0.8, -5);
-            mejaRapat.castShadow = true;
-            mejaRapat.receiveShadow = true;
-            scene.add(mejaRapat);
-
-            // === Semua Karyawan & Meja ===
+            const mejaRapat = new THREE.Mesh(new THREE.BoxGeometry(4, 0.15, 1.8), new THREE.MeshLambertMaterial({ color: 0x5d3a1a }));
+            mejaRapat.position.set(0, 0.8, -5); mejaRapat.castShadow = true; scene.add(mejaRapat);
             const tim = [
                 { nama: 'Arif', x: 0, z: -5, warna: 0x4a90e2 },
                 { nama: 'Rizky', x: -6, z: -4, warna: 0xe74c3c },
@@ -221,43 +120,16 @@
                 { nama: 'Nova', x: 2.5, z: 4, warna: 0x3498db },
                 { nama: 'Omega', x: 6, z: 4, warna: 0x607d8b }
             ];
-
-            tim.forEach(t => {
-                buatMeja(t.x, t.z);
-                buatOrang(t.nama, t.x, t.z + 1.2, t.warna);
-            });
-
-            // === Dekorasi: Tanaman Pot ===
+            tim.forEach(t => { buatMeja(t.x, t.z); buatOrang(t.nama, t.x, t.z + 1.2, t.warna); });
             function buatTanaman(x, z) {
-                const pot = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.25, 0.2, 0.35, 16),
-                    new THREE.MeshLambertMaterial({ color: 0xb87333 })
-                );
-                pot.position.set(x, 0.175, z);
-                pot.castShadow = true;
-                scene.add(pot);
-
-                const daun = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.45, 8, 8),
-                    new THREE.MeshLambertMaterial({ color: 0x228b22 })
-                );
-                daun.position.set(x, 0.7, z);
-                daun.castShadow = true;
-                scene.add(daun);
+                const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.2, 0.35, 16), new THREE.MeshLambertMaterial({ color: 0xb87333 }));
+                pot.position.set(x, 0.175, z); pot.castShadow = true; scene.add(pot);
+                const daun = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 8), new THREE.MeshLambertMaterial({ color: 0x228b22 }));
+                daun.position.set(x, 0.7, z); daun.castShadow = true; scene.add(daun);
             }
-            buatTanaman(-10, -6);
-            buatTanaman(10, -6);
-            buatTanaman(-10, 6);
-            buatTanaman(10, 6);
-
-            // === Animasi ===
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
+            buatTanaman(-10, -6); buatTanaman(10, -6); buatTanaman(-10, 6); buatTanaman(10, 6);
+            function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
             animate();
-
             window.addEventListener('resize', function() {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
